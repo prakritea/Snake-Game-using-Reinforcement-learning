@@ -17,10 +17,18 @@ class Direction(Enum):
 Point = namedtuple('Point', 'x, y')
 
 # rgb colors
+# rgb colors
+# Modern Palette
 WHITE = (255, 255, 255)
-RED = (200,0,0)
-BLUE1 = (0, 0, 255)
-BLUE2 = (0, 100, 255)
+# Dark Background
+BG_COLOR = (30, 30, 30)
+# Snake
+SNAKE_HEAD_COLOR = (0, 255, 0)      # Bright Green
+SNAKE_BODY_COLOR = (34, 139, 34)    # Forest Green
+SNAKE_BORDER_COLOR = (0, 100, 0)    # Dark Green
+# Food
+FOOD_COLOR = (255, 69, 0)           # Red-Orange
+FOOD_BORDER = (139, 0, 0)           # Dark Red
 BLACK = (0,0,0)
 
 BLOCK_SIZE = 20
@@ -110,13 +118,31 @@ class SnakeGameAI:
 
 
     def _update_ui(self):
-        self.display.fill(BLACK)
+        self.display.fill(BG_COLOR)
 
-        for pt in self.snake:
-            pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-            pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
+        for i, pt in enumerate(self.snake):
+            # Choose color based on head or body
+            if i == 0:
+                color = SNAKE_HEAD_COLOR
+            else:
+                color = SNAKE_BODY_COLOR
+            
+            # Draw Main Body (Rounded Rect)
+            rect = pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE)
+            pygame.draw.rect(self.display, color, rect, border_radius=4)
+            
+            # Draw Border (Optional, for detail)
+            pygame.draw.rect(self.display, SNAKE_BORDER_COLOR, rect, width=1, border_radius=4)
 
-        pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
+        # Draw Food (Circle)
+        # Center of the block
+        center_x = self.food.x + BLOCK_SIZE // 2
+        center_y = self.food.y + BLOCK_SIZE // 2
+        radius = BLOCK_SIZE // 2 - 2
+        
+        pygame.draw.circle(self.display, FOOD_COLOR, (center_x, center_y), radius)
+        # Food Border
+        pygame.draw.circle(self.display, FOOD_BORDER, (center_x, center_y), radius, width=2)
 
         text = font.render("Score: " + str(self.score), True, WHITE)
         self.display.blit(text, [0, 0])
